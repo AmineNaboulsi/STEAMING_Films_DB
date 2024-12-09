@@ -77,4 +77,13 @@ UPDATE user
 SET 
 user.subscription = (select SubscriptionID from subscription where LOWER(SubscriptionType) = 'premium' LIMIT 1)
 where user.Subscription =  (select SubscriptionID from subscription where LOWER(SubscriptionType) = 'basic' LIMIT 1)
--- Filtrer les visionnages 
+-- Filtrer les visionnages
+SELECT user.UserID , CONCAT(user.FirstName , user.LastName) as 'KHONA FLGHRONA' FROM watchhistory 
+JOIN user on user.UserID = watchhistory.UserID 
+WHERE watchhistory.CompletionPercentage = 100;
+-- Trier et limiter 
+select * from movie ORDER BY movie.Duration LIMIT 5;
+-- Agrégation 
+SELECT watchhistory.MovieID , movie.title , CONCAT(AVG(CompletionPercentage),'%') as 'Complétion ' FROM watchhistory 
+join movie on movie.MovieID = watchhistory.MovieID
+GROUP BY watchhistory.MovieID , CompletionPercentage 
