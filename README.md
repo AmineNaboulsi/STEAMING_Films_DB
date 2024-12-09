@@ -1,1 +1,1 @@
-![Alt text](./readmesvg)
+![Alt text](./readmesvg.svg)
