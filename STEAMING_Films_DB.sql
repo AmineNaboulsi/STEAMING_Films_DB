@@ -51,8 +51,7 @@ CREATE TABLE watchhistory
 	MovieID INT NOT NULL,
 	WatchDate Date NOT NULL ,
     CompletionPercentage INT NOT NULL DEFAULT  0,
-    check(ReleaseYear>1000 and ReleaseYear<9999),
-    FOREIGN KEY (WatchDate) REFERENCES movie(MovieID)
+    FOREIGN KEY (MovieID) REFERENCES movie(MovieID)
 );
 -- Create review table 
 CREATE TABLE review
@@ -66,4 +65,16 @@ CREATE TABLE review
     FOREIGN KEY (UserID) REFERENCES user(UserID),
     FOREIGN KEY (MovieID) REFERENCES movie(MovieID)
 );
-
+-- Insérer un film
+INSERT INTO movie 
+(title , Genre )
+ VALUE ('Data Science Adventures' , 'Documentary')
+--Rechercher des films 
+SELECT * FROM movie 
+WHERE LOWER(movie.Genre) = 'comedy' and movie.ReleaseYear > 2020
+-- Mise à jour des abonnements 
+UPDATE user 
+SET 
+user.subscription = (select SubscriptionID from subscription where LOWER(SubscriptionType) = 'premium' LIMIT 1)
+where user.Subscription =  (select SubscriptionID from subscription where LOWER(SubscriptionType) = 'basic' LIMIT 1)
+-- Filtrer les visionnages 

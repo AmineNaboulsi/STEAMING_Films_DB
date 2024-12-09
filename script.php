@@ -55,7 +55,6 @@ function insertMovies($conn, $faker, $count = 100) {
         $Rating = $faker->randomElement(
             ['G', 'PG', 'PG-13', 'R', 'NC-17']
         );
-        echo '$Rating  :'.$Rating;
 
         $ReleaseYear = $faker->numberBetween(1990, 2024);
         $Duration = $faker->numberBetween(60, 240); // Duration in minutes
@@ -66,8 +65,61 @@ function insertMovies($conn, $faker, $count = 100) {
     $stmt->close();
 }
 
+function getAllUsers($conn){
+    $sql = "SELECT UserID FROM user";
+
+    $result = $conn->query($sql);
+
+    if ($result->num_rows > 0) {
+        $data = array();
+        while ($row = $result->fetch_assoc()) {
+            $data[] = (int)$row['UserID'];
+        }
+        return $data;
+    } else {
+        return [];
+    }
+}
+
+function getAllMovies($conn){
+    $sql = "SELECT MovieID FROM movie";
+
+    $result = $conn->query($sql);
+
+    if ($result->num_rows > 0) {
+        $data = array();
+        while ($row = $result->fetch_assoc()) {
+            $data[] = (int)$row['MovieID'];
+        }
+        return $data;
+    } else {
+        return [];
+    }
+}
+
+function insertwatchhistory($conn, $faker, $count = 50) {
+    $stmt = $conn->prepare("INSERT INTO 
+    watchhistory (UserID, MovieID, WatchDate, CompletionPercentage)
+    VALUES (?, ?, ?, ?)");
+	
+    $users = getAllUsers($conn);
+    $movies = getAllMovies($conn);
+
+    for ($i = 0; $i < $count; $i++) {
+        $UserID = $faker->randomElement($users);
+        $MovieID = $faker->randomElement($movies);
+        $WatchDate = $faker->dateTimeBetween('-1 year', 'now')->format('Y-m-d H:i:s');
+        $CompletionPercentage = $faker->numberBetween(0, 100);
+        
+        $stmt->bind_param("iiss", $UserID, $MovieID, $WatchDate, $CompletionPercentage);
+        $stmt->execute();
+    }
+    $stmt->close();
+}
 //insertUsers($conn, $faker);
-insertMovies($conn, $faker);
+//insertMovies($conn, $faker);
+// getAllUsers($conn);
+insertwatchhistory($conn, $faker);
 echo "Fake data generated successfully!";
 
 $conn->close();
