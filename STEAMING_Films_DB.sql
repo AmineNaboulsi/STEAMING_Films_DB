@@ -15,11 +15,13 @@ CREATE TABLE subscription
 	SubscriptionType varchar(50) NOT NULL,
 	MonthlyFee decimal(10,2) NOT NULL
 );
+
 -- trying to add contraint after definition
 ALTER TABLE subscription ADD CONSTRAINT CHECK (
     LOWER(SubscriptionType) = 'basic' or 
     LOWER(SubscriptionType) = 'premium'
 )
+
 
 -- Create user table
 CREATE TABLE user
@@ -32,6 +34,7 @@ CREATE TABLE user
     Subscription INT NOT NULL ,
     FOREIGN KEY (Subscription) REFERENCES subscription(SubscriptionID)
 );
+
 -- Create movie table 
 CREATE TABLE movie
 (
@@ -43,6 +46,7 @@ CREATE TABLE movie
     Rating varchar(10) NOT NULL,
     check(ReleaseYear>1000 and ReleaseYear<9999)
 );
+
 -- Create watchhistory table 
 CREATE TABLE watchhistory
 (
@@ -55,6 +59,7 @@ CREATE TABLE watchhistory
     FOREIGN KEY (UserID) REFERENCES user(MovieID),
 	PRIMARY KEY (UserID , WatchDate)
 );
+
 -- Create review table 
 CREATE TABLE review
 (
@@ -67,37 +72,64 @@ CREATE TABLE review
     FOREIGN KEY (UserID) REFERENCES user(UserID),
     FOREIGN KEY (MovieID) REFERENCES movie(MovieID)
 );
+
+
 -- 1. Insérer un film
 INSERT INTO movie 
 (title , Genre )
  VALUE ('Data Science Adventures' , 'Documentary')
+
+
 -- 2. Rechercher des films 
 SELECT * FROM movie 
 WHERE LOWER(movie.Genre) = 'comedy' and movie.ReleaseYear > 2020
+
+
 -- 3. Mise à jour des abonnements 
 UPDATE user 
 SET 
 user.subscription = (select SubscriptionID from subscription where LOWER(SubscriptionType) = 'premium' LIMIT 1)
 where user.Subscription =  (select SubscriptionID from subscription where LOWER(SubscriptionType) = 'basic' LIMIT 1)
+
+
 -- 4.Afficher les abonnements 
 SELECT CONCAT(user.FirstName , ' ',user.LastName ),
-user.Email , SubscriptionType
+user.Email , CASE 
+WHEN SubscriptionType IS NULL THEN 'Ma3ando walo'
+ELSE SubscriptionType
+END
  from user
-JOIN subscription ON SubscriptionID = Subscription
+LEFT JOIN subscription ON SubscriptionID = Subscription
+
 -- 5. Filtrer les visionnages
 SELECT user.UserID , CONCAT(user.FirstName , user.LastName) as 'KHONA FLGHRONA' FROM watchhistory 
 JOIN user on user.UserID = watchhistory.UserID 
 WHERE watchhistory.CompletionPercentage = 100;
+
+
 -- 6. Trier et limiter 
 select * from movie ORDER BY movie.Duration LIMIT 5;
+
+
 -- 7. Agrégation 
 SELECT watchhistory.MovieID , movie.title , CONCAT(AVG(CompletionPercentage),'%') as 'Complétion ' FROM watchhistory 
 join movie on movie.MovieID = watchhistory.MovieID
 GROUP BY watchhistory.MovieID , CompletionPercentage ;
+
+
 -- 8. Group By 
 SELECT subscription.SubscriptionType ,  COUNT(Subscription) 
 FROM user 
 JOIN subscription 
 on user.Subscription = subscription.SubscriptionID
 GROUP BY Subscription
+
+
 -- 9. Sous-requête (Bonus)
+SELECT * FROM movie as MA
+WHERE (
+    SELECT AVG(Rating) FROM movie AS MB where 
+    MB.MovieID = MA.MovieID
+) > 4 ;
+
+

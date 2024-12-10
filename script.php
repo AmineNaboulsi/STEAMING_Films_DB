@@ -137,17 +137,38 @@ function insertrReview($conn, $faker, $count = 50) {
     }
     $stmt->close();
 }
-insertUsers($conn, $faker);
-echo "Fake data Users generated successfully!";
-insertMovies($conn, $faker);
-echo "Fake data Movies generated successfully!";
+// insertUsers($conn, $faker);
+// echo "Fake data Users generated successfully!";
+// insertMovies($conn, $faker);
+// echo "Fake data Movies generated successfully!";
 
-// getAllUsers($conn);
-insertwatchhistory($conn, $faker);
-echo "Fake data watchhistory generated successfully!";
+// // getAllUsers($conn);
+// insertwatchhistory($conn, $faker);
+// echo "Fake data watchhistory generated successfully!";
 
-insertrReview($conn, $faker);
-echo "Fake data Review generated successfully!";
+// insertrReview($conn, $faker);
+// echo "Fake data Review generated successfully!";
+
+
+function UpdateMoviesRating($conn, $faker, $count = 500) {
+    $stmt = $conn->prepare("UPDATE
+    movie SET RATING = ?
+    WHERE MovieID = ?");
+    $movies = getAllMovies($conn);
+	
+    for ($i = 0; $i < $count; $i++) {
+        $NEWRATING = $faker->numberBetween(0 , 100);
+        $RANDOMMovieID = $faker->randomElement($movies);
+
+        $stmt->bind_param("ii", $NEWRATING , $RANDOMMovieID);
+        $stmt->execute();
+    }
+    $stmt->close();
+}
+
+UpdateMoviesRating($conn , $faker);
+echo 
+'All GOOG' ;
 
 $conn->close();
 ?>
