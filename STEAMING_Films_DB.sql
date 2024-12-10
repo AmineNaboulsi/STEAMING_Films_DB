@@ -51,7 +51,9 @@ CREATE TABLE watchhistory
 	MovieID INT NOT NULL,
 	WatchDate Date NOT NULL ,
     CompletionPercentage INT NOT NULL DEFAULT  0,
-    FOREIGN KEY (MovieID) REFERENCES movie(MovieID)
+    FOREIGN KEY (MovieID) REFERENCES movie(MovieID),
+    FOREIGN KEY (UserID) REFERENCES user(MovieID),
+	PRIMARY KEY (UserID , WatchDate)
 );
 -- Create review table 
 CREATE TABLE review
@@ -86,4 +88,11 @@ select * from movie ORDER BY movie.Duration LIMIT 5;
 -- Agrégation 
 SELECT watchhistory.MovieID , movie.title , CONCAT(AVG(CompletionPercentage),'%') as 'Complétion ' FROM watchhistory 
 join movie on movie.MovieID = watchhistory.MovieID
-GROUP BY watchhistory.MovieID , CompletionPercentage 
+GROUP BY watchhistory.MovieID , CompletionPercentage ;
+-- Group By 
+SELECT subscription.SubscriptionType ,  COUNT(Subscription) 
+FROM user 
+JOIN subscription 
+on user.Subscription = subscription.SubscriptionID
+GROUP BY Subscription
+-- Sous-requête (Bonus)
