@@ -116,11 +116,38 @@ function insertwatchhistory($conn, $faker, $count = 50) {
     }
     $stmt->close();
 }
-//insertUsers($conn, $faker);
-//insertMovies($conn, $faker);
+
+function insertrReview($conn, $faker, $count = 50) {
+    $stmt = $conn->prepare("INSERT INTO 
+    review (UserID, MovieID, RATING, ReviewText, ReviewDate)
+    VALUES (?, ?, ?, ?, ?)");
+	
+    $users = getAllUsers($conn);
+    $movies = getAllMovies($conn);
+
+    for ($i = 0; $i < $count; $i++) {
+        $UserID = $faker->randomElement($users);
+        $MovieID = $faker->randomElement($movies);
+        $RATING = $faker->numberBetween(1, 5); // More typical rating scale
+        $ReviewText = $faker->paragraph; // Full paragraph instead of short sentence
+        $ReviewDate = $faker->dateTimeBetween('-1 year', 'now')->format('Y-m-d');
+
+        $stmt->bind_param("iiiss", $UserID, $MovieID, $RATING, $ReviewText, $ReviewDate);
+        $stmt->execute();
+    }
+    $stmt->close();
+}
+insertUsers($conn, $faker);
+echo "Fake data Users generated successfully!";
+insertMovies($conn, $faker);
+echo "Fake data Movies generated successfully!";
+
 // getAllUsers($conn);
 insertwatchhistory($conn, $faker);
-echo "Fake data generated successfully!";
+echo "Fake data watchhistory generated successfully!";
+
+insertrReview($conn, $faker);
+echo "Fake data Review generated successfully!";
 
 $conn->close();
 ?>
